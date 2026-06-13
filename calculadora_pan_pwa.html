@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Pan de Molde — ALEN+PRO</title>
+<meta name="theme-color" content="#F5C400">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:13px;color:#222;background:#f7f6f2;padding:16px}
+.header{background:#F5C400;padding:14px 18px;border-radius:10px;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.logo-box{background:#222;border-radius:7px;padding:5px 11px;display:flex;align-items:center;gap:5px}
+.logo-plus{color:#F5C400;font-size:20px;font-weight:700;line-height:1}
+.logo-text{color:#fff;font-size:11px;font-weight:600;line-height:1.3}
+.htitle{font-size:15px;font-weight:700;color:#222}
+.hsub{font-size:11px;color:#444;margin-top:2px}
+.card{background:#fff;border:1px solid #e8e5dc;border-radius:10px;padding:13px 15px;margin-bottom:12px}
+.section-label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.metric{background:#f5f4ef;border-radius:8px;padding:10px 12px;text-align:center}
+.metric-val{font-size:19px;font-weight:700;color:#222}
+.metric-unit{font-size:10px;color:#777;margin-top:1px}
+.benefit-card{background:#f0f7ec;border:1px solid #c8e0b8;border-radius:9px;padding:10px 8px;text-align:center}
+.benefit-icon{font-size:20px;margin-bottom:4px}
+.benefit-val{font-size:14px;font-weight:700;color:#276332}
+.benefit-label{font-size:10px;color:#555;margin-top:3px;line-height:1.4}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;color:#777;font-weight:600;padding:4px 6px;border-bottom:1px solid #eee;font-size:11px}
+td{padding:5px 6px;border-bottom:1px solid #f0ede5;vertical-align:middle}
+td input[type=number]{width:100%;border:1px solid #ddd;border-radius:5px;padding:3px 6px;font-size:12px;text-align:right;background:#fff;color:#222}
+td input[type=number]:focus{outline:none;border-color:#F5C400}
+.soya-row td{background:#FDF6E3}
+.badge{display:inline-block;font-size:10px;padding:1px 8px;border-radius:10px;font-weight:700}
+.badge-soya{background:#F5C400;color:#222}
+.badge-trigo{background:#e0ddd6;color:#555}
+.badge-green{background:#d4edda;color:#276332}
+.badge-amber{background:#fff3cd;color:#856404}
+.badge-red{background:#f8d7da;color:#842029}
+.slider-row{display:flex;align-items:center;gap:10px;margin:8px 0 4px}
+.slider-row input[type=range]{flex:1;accent-color:#F5C400}
+.bar-wrap{display:flex;height:9px;border-radius:9px;overflow:hidden;margin-top:6px}
+.comment-box{background:#FDF6E3;border-left:3px solid #F5C400;border-radius:0 8px 8px 0;padding:10px 13px;font-size:12px;line-height:1.7}
+.comment-box ul{margin:5px 0 0 16px}
+.comment-box li{margin-bottom:3px}
+.flex-sb{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.note-sm{font-size:10px;color:#999}
+.total-row td{font-weight:700;background:#f5f4ef}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:8px;border:none;font-size:13px;font-weight:700;cursor:pointer}
+.btn-yellow{background:#F5C400;color:#222}
+.btn-yellow:hover{background:#e6b800}
+.btn-outline{background:#fff;color:#555;border:1px solid #ddd}
+.btn-outline:hover{background:#f5f4ef}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:8px 20px;border-radius:20px;font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+.saving-dot{width:8px;height:8px;border-radius:50%;background:#F5C400;display:inline-block;margin-left:6px;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo-box">
+    <span class="logo-plus">+</span>
+    <div class="logo-text">ALEN<br>PRO</div>
+  </div>
+  <div style="flex:1">
+    <div class="htitle">Calculadora de Formulación — Pan de Molde</div>
+    <div class="hsub">Harina Proteínica de Soya ALEN+PRO · Nutrición Positiva</div>
+  </div>
+  <div id="sync_status" style="font-size:10px;color:#555;text-align:right;min-width:80px"></div>
+</div>
+
+<!-- BATCH + PRECIOS -->
+<div class="grid2">
+  <div class="card">
+    <div class="section-label">Tamaño del batch</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <input type="number" id="batch" value="10" min="1" max="9999" step="1"
+        style="font-size:20px;font-weight:700;width:88px;border:1px solid #ddd;border-radius:7px;padding:5px 8px;text-align:right;background:#fff;color:#222">
+      <span style="color:#777;font-size:13px">kg de harina total</span>
+    </div>
+    <div style="margin-top:7px;font-size:11px;color:#777">Unidades est. (600 g/pan): <strong id="units" style="color:#222">—</strong></div>
+  </div>
+  <div class="card">
+    <div class="section-label">Precio de harinas (COP/kg)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:2px">
+      <div>
+        <div style="font-size:10px;color:#777;margin-bottom:3px">Harina de trigo</div>
+        <input type="number" id="p_trigo" value="2200" min="0" step="50"
+          style="width:100%;border:1px solid #ddd;border-radius:6px;padding:4px 7px;font-size:13px;background:#fff;color:#222">
+      </div>
+      <div>
+        <div style="font-size:10px;color:#854F0B;margin-bottom:3px;font-weight:700">H. Proteínica Soya ALEN+PRO</div>
+        <input type="number" id="p_soya" value="5800" min="0" step="50"
+          style="width:100%;border:2px solid #F5C400;border-radius:6px;padding:4px 7px;font-size:13px;background:#fff;color:#222">
+      </div>
+    </div>
+    <div style="margin-top:6px;font-size:10px;color:#999">⚠️ Producto terminado con registro sanitario — diferente a la torta de soya (materia prima).</div>
+  </div>
+</div>
+
+<!-- SLIDER -->
+<div class="card" style="margin-bottom:12px">
+  <div class="flex-sb">
+    <div class="section-label" style="margin:0">Sustitución: harina de trigo → Harina Proteínica de Soya ALEN+PRO</div>
+    <div style="display:flex;gap:6px">
+      <span class="badge badge-trigo">Trigo <span id="lb_trigo">85</span>%</span>
+      <span class="badge badge-soya">Soya <span id="lb_soya">15</span>%</span>
+    </div>
+  </div>
+  <div class="slider-row">
+    <span style="font-size:11px;color:#999">0%</span>
+    <input type="range" id="soya_pct" min="0" max="40" value="15" step="1">
+    <span style="font-size:11px;color:#999">40%</span>
+  </div>
+  <div class="bar-wrap">
+    <div id="bar_trigo" style="width:85%;background:#b0ada6;transition:width .25s"></div>
+    <div id="bar_soya" style="width:15%;background:#F5C400;transition:width .25s"></div>
+  </div>
+  <div style="font-size:10px;color:#999;margin-top:5px">Rango óptimo recomendado para panadería: 10–20%</div>
+</div>
+
+<!-- TABLA FÓRMULA -->
+<div class="card" style="margin-bottom:12px">
+  <div class="flex-sb" style="margin-bottom:8px">
+    <div class="section-label" style="margin:0">Fórmula base — Pan de Molde (% de panadero, editable)</div>
+    <span class="note-sm">Base = 100% harina total</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:32%">Ingrediente</th>
+        <th style="width:16%;text-align:right">% Pan.</th>
+        <th style="width:20%;text-align:right">Gramos</th>
+        <th style="width:20%;text-align:right">Costo COP</th>
+        <th style="width:12%;text-align:right">$/kg</th>
+      </tr>
+    </thead>
+    <tbody id="tabla_body"></tbody>
+    <tfoot>
+      <tr class="total-row">
+        <td>Total masa</td>
+        <td style="text-align:right" id="tot_pct">—</td>
+        <td style="text-align:right" id="tot_g">—</td>
+        <td style="text-align:right" id="tot_costo">—</td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+
+<!-- MÉTRICAS -->
+<div class="grid3">
+  <div class="metric">
+    <div class="metric-val" id="m_costo_kg">—</div>
+    <div class="metric-unit">COP / kg de masa</div>
+  </div>
+  <div class="metric">
+    <div class="metric-val" id="m_costo_pan">—</div>
+    <div class="metric-unit">COP / pan 600 g (rendimiento real)</div>
+  </div>
+  <div class="metric">
+    <div class="metric-val" id="m_proteina">—</div>
+    <div class="metric-unit">% proteína estimada (harinas)</div>
+  </div>
+</div>
+
+<!-- BENEFICIOS -->
+<div class="card" id="card_beneficios" style="display:none;margin-bottom:12px">
+  <div class="section-label">Beneficios cuantificados — inclusión de Harina Proteínica de Soya ALEN+PRO</div>
+  <div class="grid4" id="grid_beneficios" style="margin-top:6px"></div>
+  <div style="margin-top:8px;font-size:10px;color:#aaa">* Estimaciones basadas en Ficha Técnica FT-GC-001 v01. Los valores de retención de agua y vida útil son referenciales.</div>
+</div>
+
+<!-- PANEL TÉCNICO -->
+<div class="grid2">
+  <div class="card">
+    <div class="section-label">Perfil nutricional estimado (mezcla de harinas)</div>
+    <table><tbody id="tabla_nutri"></tbody></table>
+  </div>
+  <div class="card">
+    <div class="section-label">Indicadores técnicos</div>
+    <table><tbody id="tabla_tech"></tbody></table>
+  </div>
+</div>
+
+<!-- RECOMENDACIONES -->
+<div class="card">
+  <div class="section-label">Recomendaciones técnicas</div>
+  <div class="comment-box" id="comentarios"></div>
+</div>
+
+<!-- PIE -->
+<div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+  <div style="font-size:10px;color:#aaa">FT-GC-001 v01 · Alimento Energético Proteico S.A.S. · NIT 800183642-5 · www.alenpro.co · Reg. Sanitario NSA-000868-2016</div>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-outline" onclick="resetFormula()">↺ Restablecer</button>
+    <button class="btn btn-yellow" onclick="exportarPDF()">⬇ Exportar PDF</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB7KbW_QX-ymuRxwNh9byx6hICLEUcRpKE",
+  authDomain: "alenpro-inventario.firebaseapp.com",
+  databaseURL: "https://alenpro-inventario-default-rtdb.firebaseio.com",
+  projectId: "alenpro-inventario",
+  storageBucket: "alenpro-inventario.firebasestorage.app",
+  messagingSenderId: "507355294371",
+  appId: "1:507355294371:web:d0e14685a8a550400bed16"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const DB_PATH = "calculadora-pan/formula";
+
+// ── CONSTANTES TÉCNICAS ──────────────────────────────────────────
+const SOYA={proteina:[50,65],humedad:[6,7],grasa:[0,2],fibra:[0,5],ceniza:[0,8]};
+const TRIGO={proteina:10,humedad:13,grasa:1.2,fibra:2.5,ceniza:0.55};
+const APRO='Harina Proteínica de Soya ALEN+PRO';
+
+const DEFAULTS = [
+  {id:'trigo',nom:'Harina de trigo',          pct:null,pid:null,       pk:2200, edPct:false,edPk:false},
+  {id:'soya', nom:APRO,                        pct:null,pid:null,       pk:5800, edPct:false,edPk:false},
+  {id:'agua', nom:'Agua',                      pct:60,  pid:null,       pk:0,    edPct:true, edPk:false},
+  {id:'azucar',nom:'Azúcar',                   pct:8,   pid:'p_azucar', pk:2800, edPct:true, edPk:true},
+  {id:'sal',  nom:'Sal',                       pct:2,   pid:'p_sal',    pk:800,  edPct:true, edPk:true},
+  {id:'grasa',nom:'Manteca / Margarina',       pct:6,   pid:'p_grasa',  pk:5500, edPct:true, edPk:true},
+  {id:'lev',  nom:'Levadura fresca',           pct:2.5, pid:'p_lev',    pk:8000, edPct:true, edPk:true},
+  {id:'leche',nom:'Leche en polvo',            pct:3,   pid:'p_leche',  pk:18000,edPct:true, edPk:true},
+  {id:'mejor',nom:'Mejorador de masa',         pct:0.5, pid:'p_mejor',  pk:12000,edPct:true, edPk:true},
+];
+
+let ings = DEFAULTS.map(i=>({...i}));
+
+const fmt=(n,d=0)=>n.toLocaleString('es-CO',{maximumFractionDigits:d});
+const gv=id=>parseFloat(document.getElementById(id)?.value)||0;
+let saveTimer=null;
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function setSyncStatus(msg){
+  document.getElementById('sync_status').innerHTML=msg;
+}
+
+// ── FIREBASE: CARGAR ────────────────────────────────────────────
+async function cargarDesdeFirebase(){
+  setSyncStatus('Cargando...');
+  try {
+    const snap = await get(ref(db, DB_PATH));
+    if(snap.exists()){
+      const data = snap.val();
+      if(data.p_trigo) document.getElementById('p_trigo').value=data.p_trigo;
+      if(data.p_soya)  document.getElementById('p_soya').value=data.p_soya;
+      ings.forEach(ing=>{
+        if(ing.edPct && data['pct_'+ing.id]!==undefined) ing.pct=data['pct_'+ing.id];
+        if(ing.edPk  && data['pk_'+ing.id]!==undefined)  ing.pk =data['pk_'+ing.id];
+      });
+      setSyncStatus('✓ Sincronizado');
+      showToast('Fórmula cargada desde Firebase');
+    } else {
+      setSyncStatus('✓ Valores por defecto');
+    }
+  } catch(e){
+    setSyncStatus('⚠️ Sin conexión');
+  }
+  calcular();
+}
+
+// ── FIREBASE: GUARDAR ───────────────────────────────────────────
+function guardarEnFirebase(){
+  clearTimeout(saveTimer);
+  setSyncStatus('Guardando <span class="saving-dot"></span>');
+  saveTimer=setTimeout(async()=>{
+    const data={ p_trigo: gv('p_trigo'), p_soya: gv('p_soya') };
+    ings.forEach(ing=>{
+      if(ing.edPct) data['pct_'+ing.id]=ing.pct;
+      if(ing.edPk)  data['pk_'+ing.id]=ing.pk;
+    });
+    try {
+      await set(ref(db, DB_PATH), data);
+      setSyncStatus('✓ Guardado');
+      showToast('Fórmula guardada en Firebase');
+    } catch(e){
+      setSyncStatus('⚠️ Error al guardar');
+    }
+  }, 1200);
+}
+
+// ── CALCULAR ────────────────────────────────────────────────────
+function calcular(){
+  const sp=parseInt(document.getElementById('soya_pct').value);
+  const tp=100-sp;
+  const batch=gv('batch')||10;
+  const p_trigo=gv('p_trigo');
+  const p_soya=gv('p_soya');
+
+  document.getElementById('lb_trigo').textContent=tp;
+  document.getElementById('lb_soya').textContent=sp;
+  document.getElementById('bar_trigo').style.width=tp+'%';
+  document.getElementById('bar_soya').style.width=sp+'%';
+
+  let tot_pct=0, tot_costo=0;
+  const rows=[];
+
+  ings.forEach(ing=>{
+    let pct=ing.pct, pk=ing.pk;
+    if(ing.id==='trigo'){pct=tp; pk=p_trigo;}
+    if(ing.id==='soya') {pct=sp; pk=p_soya;}
+    if(ing.pid){
+      const el=document.getElementById(ing.pid);
+      if(el) pk=parseFloat(el.value)||ing.pk;
+    }
+    const g=batch*1000*(pct/100);
+    const costo=(g/1000)*pk;
+    tot_pct+=pct; tot_costo+=costo;
+    rows.push({...ing,pct,pk,g,costo});
+  });
+
+  const tot_g=batch*1000*(tot_pct/100);
+  document.getElementById('tot_pct').textContent=fmt(tot_pct)+'%';
+  document.getElementById('tot_g').textContent=fmt(tot_g)+' g';
+  document.getElementById('tot_costo').textContent='$'+fmt(tot_costo);
+
+  const agua_extra=batch*(sp/100)*0.18;
+  const masa_real=(tot_g/1000)+agua_extra;
+  const panes_ajustados=Math.round(masa_real/0.6);
+  const panes_base=Math.round((tot_g/1000)/0.6);
+  const panes_extra=Math.max(0,panes_ajustados-panes_base);
+  const costo_kg=tot_costo/(masa_real||1);
+  const costo_pan=costo_kg*0.6;
+
+  document.getElementById('m_costo_kg').textContent='$'+fmt(costo_kg);
+  document.getElementById('m_costo_pan').textContent='$'+fmt(costo_pan);
+  document.getElementById('units').textContent=panes_ajustados+' panes'+(sp>0&&panes_extra>0?' (+'+panes_extra+' por retención)':'');
+
+  const prot=(tp/100)*TRIGO.proteina+(sp/100)*((SOYA.proteina[0]+SOYA.proteina[1])/2);
+  const hum =(tp/100)*TRIGO.humedad +(sp/100)*((SOYA.humedad[0] +SOYA.humedad[1]) /2);
+  const gra =(tp/100)*TRIGO.grasa   +(sp/100)*((SOYA.grasa[0]   +SOYA.grasa[1])   /2);
+  const fib =(tp/100)*TRIGO.fibra   +(sp/100)*((SOYA.fibra[0]   +SOYA.fibra[1])   /2);
+  const cen =(tp/100)*TRIGO.ceniza  +(sp/100)*((SOYA.ceniza[0]  +SOYA.ceniza[1])  /2);
+  document.getElementById('m_proteina').textContent=prot.toFixed(1)+'%';
+
+  document.getElementById('tabla_nutri').innerHTML=`
+    <tr><td style="color:#777">Proteína estimada</td><td style="text-align:right;font-weight:700;color:#276332">${prot.toFixed(1)}%</td></tr>
+    <tr><td style="color:#777">Humedad estimada</td><td style="text-align:right">${hum.toFixed(1)}%</td></tr>
+    <tr><td style="color:#777">Grasa estimada</td><td style="text-align:right">${gra.toFixed(1)}%</td></tr>
+    <tr><td style="color:#777">Fibra estimada</td><td style="text-align:right">${fib.toFixed(1)}%</td></tr>
+    <tr><td style="color:#777">Ceniza estimada</td><td style="text-align:right">${cen.toFixed(1)}%</td></tr>`;
+
+  const hid_rec=60+sp*0.18;
+  const agua_pct=ings.find(i=>i.id==='agua').pct;
+  const dif_agua=hid_rec-agua_pct;
+  let nivel=sp===0?'ninguno':sp<=10?'bajo':sp<=20?'optimo':sp<=30?'moderado':'alto';
+  const nivTexto={ninguno:'Sin sustitución',bajo:'Bajo (1–10%)',optimo:'Óptimo (11–20%)',moderado:'Moderado (21–30%)',alto:'Alto (>30%)'}[nivel];
+  const nivBadge={ninguno:'badge-green',bajo:'badge-green',optimo:'badge-green',moderado:'badge-amber',alto:'badge-red'}[nivel];
+
+  document.getElementById('tabla_tech').innerHTML=`
+    <tr><td style="color:#777">Nivel de sustitución</td><td style="text-align:right"><span class="badge ${nivBadge}">${nivTexto}</span></td></tr>
+    <tr><td style="color:#777">Hidratación recomendada</td><td style="text-align:right;font-weight:700">${hid_rec.toFixed(0)}%</td></tr>
+    <tr><td style="color:#777">Hidratación actual</td><td style="text-align:right">${agua_pct}%</td></tr>
+    <tr><td style="color:#777">Diferencia absorción</td><td style="text-align:right;${dif_agua>0.5?'color:#842029;font-weight:700':'color:#276332'}">${dif_agua>0?'+':''}${dif_agua.toFixed(1)}%</td></tr>
+    <tr><td style="color:#777">Panes extra por retención</td><td style="text-align:right;color:#276332;font-weight:700">${sp>0&&panes_extra>0?'+'+panes_extra+' panes':'—'}</td></tr>`;
+
+  renderTabla(rows);
+  renderBeneficios(sp,prot,fib,dif_agua,panes_extra);
+  renderComentarios(nivel,sp,tp,prot,hid_rec,agua_pct,dif_agua,fib,panes_extra,batch);
+}
+
+function renderTabla(rows){
+  const body=document.getElementById('tabla_body');
+  body.innerHTML='';
+  rows.forEach(r=>{
+    const tr=document.createElement('tr');
+    if(r.id==='soya') tr.className='soya-row';
+    const nomCell=r.id==='soya'
+      ?`${r.nom} <span class="badge badge-soya" style="font-size:9px">ALEN+PRO</span>`
+      :r.nom;
+    tr.innerHTML=`
+      <td>${nomCell}</td>
+      <td style="text-align:right">${r.edPct
+        ?`<input type="number" value="${r.pct}" min="0" max="300" step="0.5" data-id="${r.id}" class="pct-inp">`
+        :`<strong>${r.pct}%</strong>`}</td>
+      <td style="text-align:right">${fmt(r.g)} g</td>
+      <td style="text-align:right">${r.costo>0?'$'+fmt(r.costo):'-'}</td>
+      <td style="text-align:right">${r.edPk&&r.pid
+        ?`<input type="number" value="${r.pk}" min="0" step="100" data-pid="${r.pid}" class="pk-inp" style="width:68px">`
+        :r.pk>0?'$'+fmt(r.pk):'-'}</td>`;
+    body.appendChild(tr);
+  });
+  document.querySelectorAll('.pct-inp').forEach(el=>{
+    el.addEventListener('change',function(){
+      const ing=ings.find(i=>i.id===this.dataset.id);
+      if(ing){ing.pct=parseFloat(this.value)||0; guardarEnFirebase();}
+      calcular();
+    });
+  });
+  document.querySelectorAll('.pk-inp').forEach(el=>{
+    el.addEventListener('change',function(){
+      const ing=ings.find(i=>i.pid===this.dataset.pid);
+      if(ing){ing.pk=parseFloat(this.value)||0; guardarEnFirebase();}
+      calcular();
+    });
+  });
+}
+
+function renderBeneficios(sp,prot,fib,dif_agua,panes_extra){
+  const card=document.getElementById('card_beneficios');
+  const grid=document.getElementById('grid_beneficios');
+  if(sp===0){card.style.display='none';return;}
+  card.style.display='block';
+  const prot_extra=(prot-TRIGO.proteina).toFixed(1);
+  const vida=sp<=10?'~2 días más':sp<=20?'~4 días más':'~6 días más';
+  const horneo=sp<=10?'~5%':sp<=20?'~10%':'~12%';
+  const items=[
+    {icon:'💪',val:'+'+prot_extra+'%',  label:'Proteína extra vs<br>100% harina de trigo'},
+    {icon:'💧',val:dif_agua>0?'+'+dif_agua.toFixed(1)+' g/100g':'Óptimo',label:'Mayor absorción<br>de agua en masa'},
+    {icon:'🍞',val:panes_extra>0?'+'+panes_extra+' panes':'∼ igual',label:'Panes adicionales<br>por retención de agua'},
+    {icon:'📅',val:vida,                label:'Mayor vida útil<br>estimada del pan'},
+    {icon:'🌾',val:fib.toFixed(1)+'%', label:'Fibra en mezcla<br>de harinas'},
+    {icon:'⏱', val:horneo,             label:'Reducción tiempo<br>de horneo estimada'},
+    {icon:'✅', val:'Sin aditivos',     label:'Especificación<br>Ficha Técnica ALEN+PRO'},
+    {icon:'🏅', val:'NSA-000868',       label:'Registro sanitario<br>INVIMA vigente'},
+  ];
+  grid.innerHTML=items.map(i=>`
+    <div class="benefit-card">
+      <div class="benefit-icon">${i.icon}</div>
+      <div class="benefit-val">${i.val}</div>
+      <div class="benefit-label">${i.label}</div>
+    </div>`).join('');
+}
+
+function renderComentarios(nivel,sp,tp,prot,hid_rec,agua_pct,dif_agua,fib,panes_extra,batch){
+  const nota=`<li style="font-size:11px;color:#777;margin-top:5px">⚠️ <em><strong>${APRO}</strong> es un producto terminado con registro sanitario NSA-000868-2016, obtenido por extracción y micro-pulverización del frijol soya (Glycine max). Es diferente a la torta de soya, materia prima sin procesar para consumo humano directo y de menor costo.</em></li>`;
+  let c='';
+  if(nivel==='ninguno'){
+    c=`<strong>Fórmula estándar — sin ${APRO}.</strong><br>Use el slider para evaluar el reemplazo parcial de harina de trigo por <strong>${APRO}</strong> y ver los beneficios técnicos y nutricionales para su pan de molde.`;
+  } else if(nivel==='bajo'){
+    c=`<strong>Nivel bajo (${sp}%) — Harina de trigo ${tp}% + ${APRO} ${sp}%.</strong>
+    <ul>
+      <li>Proteína de la mezcla: <strong>${prot.toFixed(1)}%</strong> — mejora perceptible en estructura y valor nutricional del pan de molde.</li>
+      <li>${dif_agua>0.5?`La <strong>${APRO}</strong> absorbe más agua que la harina de trigo. Aumente el agua aprox. <strong>${dif_agua.toFixed(1)} g</strong> por 100 g de harina total.`:'Hidratación actual adecuada para este nivel de inclusión.'}</li>
+      ${panes_extra>0?`<li>Mayor absorción genera <strong>+${panes_extra} panes adicionales</strong> por batch de ${batch} kg — mejora directa en rendimiento de producción.</li>`:''}
+      <li>Tiempo de horneo puede reducirse ~5%. Textura y color muy similares al pan convencional.</li>
+      <li>La <strong>${APRO}</strong> actúa como emulsificante natural, mejorando frescura y vida útil en anaquel (~2 días adicionales).</li>
+      ${nota}
+    </ul>`;
+  } else if(nivel==='optimo'){
+    c=`<strong>Nivel óptimo (${sp}%) — Harina de trigo ${tp}% + ${APRO} ${sp}%.</strong>
+    <ul>
+      <li>Proteína estimada: <strong>${prot.toFixed(1)}%</strong> — diferencia nutricional significativa, apta para declaración en etiqueta del pan de molde.</li>
+      <li>${dif_agua>0.5?`Aumente el agua aprox. <strong>${dif_agua.toFixed(1)} g</strong> por 100 g de harina total. La <strong>${APRO}</strong> tiene alta capacidad de absorción (humedad máx. 7% según ficha técnica).`:'Hidratación actual dentro del rango recomendado.'}</li>
+      ${panes_extra>0?`<li>Rendimiento ajustado: <strong>+${panes_extra} panes adicionales</strong> por batch — el mayor costo de la mezcla de harinas se compensa con mayor producción por batch.</li>`:''}
+      <li>Miga más firme y húmeda, mejor corte en rebanado y mayor frescura (~4 días adicionales en anaquel).</li>
+      <li>Tiempo de horneo puede reducir hasta un 10%. Monitorear temperatura interna del pan.</li>
+      <li>Fibra estimada: <strong>${fib.toFixed(1)}%</strong> — beneficio adicional para el etiquetado nutricional.</li>
+      ${nota}
+    </ul>`;
+  } else if(nivel==='moderado'){
+    c=`<strong>Nivel moderado (${sp}%) — Harina de trigo ${tp}% + ${APRO} ${sp}%) — requiere ajustes técnicos.</strong>
+    <ul>
+      <li>Proteína estimada: <strong>${prot.toFixed(1)}%</strong> — producto de alto valor nutricional, ideal para posicionamiento como pan enriquecido.</li>
+      <li>⚠️ Ajuste de agua: <strong>${dif_agua.toFixed(1)} g</strong> adicionales por 100 g de harina total para compensar la alta absorción de la <strong>${APRO}</strong>.</li>
+      ${panes_extra>0?`<li>Con la hidratación correcta, el batch puede rendir <strong>+${panes_extra} panes adicionales</strong>.</li>`:''}
+      <li>Posible aparición de notas de sabor a leguminosa. Evalúe con panel sensorial; complementar con vainilla o leche en polvo adicional.</li>
+      <li>Miga puede ser más densa. Considere aumentar levadura o extender la fermentación.</li>
+      <li>Corteza puede oscurecerse más rápido. Reduzca temperatura de horneo 5–10°C.</li>
+      ${nota}
+    </ul>`;
+  } else {
+    c=`<strong>⚠️ Nivel alto (${sp}%) — Harina de trigo ${tp}% + ${APRO} ${sp}%) — uso avanzado, requiere pruebas piloto.</strong>
+    <ul>
+      <li>La red de gluten se ve severamente reducida. La estructura de la miga puede colapsar sin ajustes adicionales.</li>
+      <li>Considere adición de gluten vital de trigo o mejoradores enzimáticos.</li>
+      <li>Proteína estimada: <strong>${prot.toFixed(1)}%</strong> — pan funcional de alto valor proteico para nichos especializados (deportivo, enriquecido).</li>
+      <li>⚠️ Hidratación: ajuste mínimo de <strong>${dif_agua.toFixed(1)} g</strong> de agua adicional por 100 g de harina total.</li>
+      <li>Posicione como pan proteico o pan deportivo con declaración en etiqueta.</li>
+      <li>Realice pruebas piloto antes de producción industrial.</li>
+      ${nota}
+    </ul>`;
+  }
+  document.getElementById('comentarios').innerHTML=c;
+}
+
+function resetFormula(){
+  if(!confirm('¿Restablecer la fórmula a los valores por defecto?')) return;
+  ings=DEFAULTS.map(i=>({...i}));
+  document.getElementById('p_trigo').value=2200;
+  document.getElementById('p_soya').value=5800;
+  guardarEnFirebase();
+  calcular();
+  showToast('Fórmula restablecida');
+}
+
+window.resetFormula=resetFormula;
+
+window.exportarPDF=function(){
+  const sp=parseInt(document.getElementById('soya_pct').value);
+  const tp=100-sp;
+  const batch=gv('batch')||10;
+  const p_trigo=gv('p_trigo'), p_soya=gv('p_soya');
+  const fecha=new Date().toLocaleDateString('es-CO',{day:'2-digit',month:'long',year:'numeric'});
+  let tot_pct=0,tot_costo=0;
+  const rows=ings.map(ing=>{
+    let pct=ing.pct,pk=ing.pk;
+    if(ing.id==='trigo'){pct=tp;pk=p_trigo;}
+    if(ing.id==='soya'){pct=sp;pk=p_soya;}
+    if(ing.pid){const el=document.getElementById(ing.pid);if(el)pk=parseFloat(el.value)||ing.pk;}
+    const g=batch*1000*(pct/100);
+    const costo=(g/1000)*pk;
+    tot_pct+=pct;tot_costo+=costo;
+    return{...ing,pct,pk,g,costo};
+  });
+  const tot_g=batch*1000*(tot_pct/100);
+  const agua_extra=batch*(sp/100)*0.18;
+  const masa_real=(tot_g/1000)+agua_extra;
+  const costo_kg=tot_costo/(masa_real||1);
+  const costo_pan=costo_kg*0.6;
+  const panes=Math.round(masa_real/0.6);
+  const prot=(tp/100)*TRIGO.proteina+(sp/100)*((SOYA.proteina[0]+SOYA.proteina[1])/2);
+  const hum=(tp/100)*TRIGO.humedad+(sp/100)*((SOYA.humedad[0]+SOYA.humedad[1])/2);
+  const gra=(tp/100)*TRIGO.grasa+(sp/100)*((SOYA.grasa[0]+SOYA.grasa[1])/2);
+  const fib=(tp/100)*TRIGO.fibra+(sp/100)*((SOYA.fibra[0]+SOYA.fibra[1])/2);
+  const hid_rec=60+sp*0.18;
+  const agua_pct=ings.find(i=>i.id==='agua').pct;
+  const dif_agua=hid_rec-agua_pct;
+  const comentHtml=document.getElementById('comentarios').innerHTML;
+  const benHtml=sp>0?document.getElementById('grid_beneficios').innerHTML:'';
+  const tbody=rows.map(r=>`<tr style="${r.id==='soya'?'background:#FDF6E3':''}">
+    <td>${r.id==='soya'?r.nom+' ★':r.nom}</td>
+    <td style="text-align:right">${r.pct}%</td>
+    <td style="text-align:right">${fmt(r.g)} g</td>
+    <td style="text-align:right">${r.pk>0?'$'+fmt(r.pk):'-'}</td>
+    <td style="text-align:right">${r.costo>0?'$'+fmt(r.costo):'-'}</td></tr>`).join('');
+  const doc=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Formulación Pan de Molde ALEN+PRO</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:11px;color:#222;padding:24px 28px;max-width:780px;margin:auto}.hdr{display:flex;align-items:center;gap:12px;background:#F5C400;padding:12px 16px;border-radius:8px;margin-bottom:14px}.lb{background:#222;border-radius:6px;padding:4px 9px;display:flex;align-items:center;gap:4px}.lp{color:#F5C400;font-size:18px;font-weight:700}.lt{color:#fff;font-size:10px;font-weight:700;line-height:1.3}h2{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin:12px 0 5px;color:#555}table{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:11px}th{background:#f5f4ef;padding:4px 7px;text-align:left;font-weight:700;border:1px solid #ddd}td{padding:4px 7px;border:1px solid #ddd}.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px}.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}.mbox{border:1px solid #ddd;border-radius:6px;padding:9px;text-align:center}.mv{font-size:16px;font-weight:700}.ml{font-size:9px;color:#777;margin-top:1px}.bcard{background:#f0f7ec;border:1px solid #c8e0b8;border-radius:7px;padding:8px;text-align:center}.bv{font-size:12px;font-weight:700;color:#276332}.bl{font-size:9px;color:#555;margin-top:2px;line-height:1.3}.cbox{background:#FDF6E3;border-left:3px solid #F5C400;border-radius:0 6px 6px 0;padding:9px 12px;font-size:11px;line-height:1.7}.cbox ul{margin:4px 0 0 14px}.cbox li{margin-bottom:2px}.foot{margin-top:14px;border-top:1px solid #ddd;padding-top:7px;font-size:9px;color:#aaa;display:flex;justify-content:space-between}.tfoot td{font-weight:700;background:#f5f4ef}</style></head><body>
+  <div class="hdr"><div class="lb"><span class="lp">+</span><div class="lt">ALEN<br>PRO</div></div><div><div style="font-size:14px;font-weight:700">Calculadora de Formulación — Pan de Molde</div><div style="font-size:10px;color:#444;margin-top:2px">Harina Proteínica de Soya ALEN+PRO · Nutrición Positiva</div></div></div>
+  <div style="font-size:10px;color:#666;margin-bottom:12px;border-bottom:1px solid #ddd;padding-bottom:7px">Generado: ${fecha} &nbsp;|&nbsp; Batch: <strong>${batch} kg</strong> &nbsp;|&nbsp; Soya: <strong>${sp}%</strong> &nbsp;|&nbsp; Trigo: <strong>${tp}%</strong> &nbsp;|&nbsp; Panes est.: <strong>${panes}</strong> (rendimiento ajustado)</div>
+  <h2>Fórmula del pan de molde</h2>
+  <table><thead><tr><th>Ingrediente</th><th style="text-align:right">% Pan.</th><th style="text-align:right">Gramos</th><th style="text-align:right">$/kg</th><th style="text-align:right">Costo COP</th></tr></thead><tbody>${tbody}</tbody><tfoot><tr class="tfoot"><td>Total masa</td><td style="text-align:right">${fmt(tot_pct)}%</td><td style="text-align:right">${fmt(tot_g)} g</td><td></td><td style="text-align:right">$${fmt(tot_costo)}</td></tr></tfoot></table>
+  <div class="g2"><div><h2>Costos (rendimiento real)</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="mbox"><div class="mv">$${fmt(costo_kg)}</div><div class="ml">COP/kg masa</div></div><div class="mbox"><div class="mv">$${fmt(costo_pan)}</div><div class="ml">COP/pan 600 g</div></div></div></div>
+  <div><h2>Perfil nutricional (harinas)</h2><table><tr><td>Proteína</td><td style="text-align:right;font-weight:700;color:#276332">${prot.toFixed(1)}%</td></tr><tr><td>Humedad</td><td style="text-align:right">${hum.toFixed(1)}%</td></tr><tr><td>Grasa</td><td style="text-align:right">${gra.toFixed(1)}%</td></tr><tr><td>Fibra</td><td style="text-align:right">${fib.toFixed(1)}%</td></tr><tr><td>Hidratación recomendada</td><td style="text-align:right;font-weight:700">${hid_rec.toFixed(0)}%</td></tr></table></div></div>
+  ${sp>0?`<h2>Beneficios cuantificados — ${APRO}</h2><div class="g4">${benHtml.replace(/benefit-card/g,'bcard').replace(/benefit-val/g,'bv').replace(/benefit-label/g,'bl').replace(/benefit-icon/g,'bi')}</div>`:''}
+  <h2>Recomendaciones técnicas</h2><div class="cbox">${comentHtml}</div>
+  <div class="foot"><span>Alimento Energético Proteico S.A.S. · NIT 800183642-5 · www.alenpro.co · Pereira, Risaralda</span><span>FT-GC-001 v01 · Reg. Sanitario NSA-000868-2016</span></div></body></html>`;
+  const blob=new Blob([doc],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const w=window.open(url,'_blank');
+  if(w){w.onload=()=>{setTimeout(()=>{w.print();URL.revokeObjectURL(url);},500);}}
+};
+
+// ── EVENTOS ─────────────────────────────────────────────────────
+document.getElementById('soya_pct').addEventListener('input',calcular);
+document.getElementById('batch').addEventListener('input',calcular);
+['p_trigo','p_soya'].forEach(id=>{
+  document.getElementById(id).addEventListener('change',()=>{guardarEnFirebase();calcular();});
+});
+
+// ── INICIO ───────────────────────────────────────────────────────
+cargarDesdeFirebase();
+</script>
+</body>
+</html>
