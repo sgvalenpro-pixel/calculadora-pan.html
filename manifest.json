@@ -1,0 +1,20 @@
+{
+  "name": "Calculadora Panadería",
+  "short_name": "Panadería",
+  "start_url": "/calculadora-pan.html/calculadora_pan_pwa.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#F5C200",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
